@@ -1,6 +1,8 @@
 class Puzzle():
 	#Goal state The goal state is "b12 345 678”.
 
+	validMoves = ["up", "down", "left", "right"]
+
 	def __init__(self):
 		self.currState = "bbb bbb bbb"
 		self.goalState = "b12 345 678"
@@ -21,7 +23,9 @@ class Puzzle():
 	#moves the blank tile
 	#Dirs include "up", "down", "left", "right"
 	def move(self, direction):
-		pass	
+		if direction not in validMoves:
+			raise ValueError
+		#move otherwise
 
 	#TODO
 	#solves the puzzle w/ A*

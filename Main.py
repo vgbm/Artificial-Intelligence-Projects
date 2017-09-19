@@ -2,6 +2,13 @@
 #handles io for interfacing with the puzzle
 
 import sys
+from Puzzle import Puzzle
+
+puzzle = Puzzle()
+
+#list of valid commands
+commands = ["setState", "randomizeState", "printState", 
+	    "move", "solve", "maxNodes"]
 
 #run commands from file
 def runFromFile(fileName):
@@ -9,7 +16,14 @@ def runFromFile(fileName):
 
 #run commands from commandline
 def runFromUserInput():
-	pass
+	while True:
+		command = input("> ")
+
+def execCommand(command):
+		commandTokens = command.split(" ")
+		if commandTokens[0] not in commands:
+			raise ValueError
+		
 
 def printUsage():
 	print("This program either takes a file for sending commands \
