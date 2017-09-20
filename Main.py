@@ -57,7 +57,6 @@ def interpret_command(command_tokens, puzzle):
         puzzle.print_state()
     elif base_command == "move":
         puzzle.move(command_tokens[1])
-        print(puzzle.h2())
     elif base_command == "solve":
         # puzzle.move(command_tokens[1])
         pass
