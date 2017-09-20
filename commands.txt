@@ -1,0 +1,5 @@
+randomizeState 10
+printState
+move left
+move down
+printState

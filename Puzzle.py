@@ -1,53 +1,83 @@
-class Puzzle():
-	#Goal state The goal state is "b12 345 678”.
+import random
 
-	validMoves = ["up", "down", "left", "right"]
+# possible moves
+_validMoves = ["up", "down", "left", "right"]
 
-	def __init__(self):
-		self.currState = "bbb bbb bbb"
-		self.goalState = "b12 345 678"
-		self.maxNodes = 0
 
-	def setState(self, state):
-		self.currState = state
+# Goal state The goal state is "b12 345 678”.
+class Puzzle:
+    def __init__(self):
+        self.goalState = "b12 345 678"
+        self.currState = self.goalState
+        self.maxNodes = 0
 
-	#TODO
-	#make n random moves from goal state
-	def randomState(self, n):
-		pass
+    def set_state(self, state):
+        self.currState = state
 
-	def printState(self):
-		print(self.currState)
+    # make n random moves from goal state
+    def randomize_state(self, n):
+        self.currState = self.goalState
+        for i in range(n):
+            self.move(random.choice(_validMoves))
 
-	#TODO
-	#moves the blank tile
-	#Dirs include "up", "down", "left", "right"
-	def move(self, direction):
-		if direction not in validMoves:
-			raise ValueError
-		#move otherwise
+    def print_state(self):
+        print(self.currState)
 
-	#TODO
-	#solves the puzzle w/ A*
-	#Heuristic can be either "h1" or "h2"
-	#"h1" is num of misplaced tiles
-	#"h2" is dist of tiles from their goal pos
-	#prints / returns num moves to solu 
-	#and seq of moves ("up", "up"...)
-	def solveAStar(self, heuristic):
-		pass
+    # moves the blank tile
+    # Dirs include "up", "down", "left", "right"
+    def move(self, direction):
 
-	#TODO
-	#solves puzzle with local beam search
-	#k is num of states
-	#eval func is defined by me and is explained in write up
-	#eval func = 0 at goal
-	#prints / returns num moves to solu 
-	#and seq of moves ("up", "up"...)
-	def solveBeam(self, k):
-		pass
+        if direction not in _validMoves:
+            raise ValueError
+            # move otherwise
+        self._move_direction(direction)
 
-	#specifies max num of nodes to consider during a search
-	#if this limit is exceeded, an error will be thrown
-	def setMaxNodes(self, n):
-		self.maxNodes = n
+    def _move_direction(self, direction):
+        blank_index = self.currState.find("b")
+        swap_tile_index = -1
+
+        if direction == "up" and blank_index > 2:
+            swap_tile_index = blank_index - 4
+        elif direction == "down" and blank_index < 6:
+            swap_tile_index = blank_index + 4
+        elif direction == "left" and blank_index not in [0, 4, 8]:
+            swap_tile_index = blank_index - 1
+        elif direction == "right" and blank_index not in [2, 6, 10]:
+            swap_tile_index = blank_index + 1
+
+        if swap_tile_index == -1:
+            print("Cannot move {} any further".format(direction))
+        else:
+            self._swap(swap_tile_index, blank_index)
+
+    def _swap(self, swap_tile_index, blank_index):
+        new_state = list(self.currState)
+        new_state[blank_index] = new_state[swap_tile_index]
+        new_state[swap_tile_index] = "b"
+
+        self.currState = "".join(new_state)
+
+    # TODO
+    # solves the puzzle w/ A*
+    # Heuristic can be either "h1" or "h2"
+    # "h1" is num of misplaced tiles
+    # "h2" is dist of tiles from their goal pos
+    # prints / returns num moves to solu
+    # and seq of moves ("up", "up"...)
+    def solve_AStar(self, heuristic):
+        pass
+
+    # TODO
+    # solves puzzle with local beam search
+    # k is num of states
+    # eval func is defined by me and is explained in write up
+    # eval func = 0 at goal
+    # prints / returns num moves to solu
+    # and seq of moves ("up", "up"...)
+    def solve_beam(self, k):
+        pass
+
+    # specifies max num of nodes to consider during a search
+    # if this limit is exceeded, an error will be thrown
+    def set_max_nodes(self, n):
+        self.maxNodes = n
