@@ -77,14 +77,19 @@ class Puzzle:
     # operates under the idea that |CurrTileIdx - GoalIdx| = 4*a + b amd dist = a + b
     # then we solve a and b for each tile and add it to an accum
     @staticmethod
-    def dist(currIdx, goalIdx):
-        idx_diff = abs(currIdx - goalIdx)
-
+    def dist(curr_idx, goal_idx):
         row_len = 4
-        a = int(idx_diff / row_len)
-        b = idx_diff %  row_len
 
-        return a + b
+        # get coordinates for the goal pos
+        goal_row = int(goal_idx / row_len)
+        goal_col = goal_idx % row_len
+
+        # get coordinates for the curr pos
+        curr_row = int(curr_idx / row_len)
+        curr_col = curr_idx % 4
+
+        # return the absolute dist between the points
+        return abs(goal_row - curr_row) + abs(goal_col - curr_col)
 
     # TODO
     # solves the puzzle w/ A*
