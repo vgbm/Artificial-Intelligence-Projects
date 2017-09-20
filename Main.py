@@ -29,8 +29,7 @@ def run_from_user_input():
 
 # list of valid commands and how many arguments each takes
 # defined in the requirements doc
-commands = {"setState": 1, "randomizeState": 1, "printState": 0, "move": 1, "solve": 1, "maxNodes": 1}
-
+commands = {"setState": 1, "randomizeState": 1, "printState": 0, "move": 1, "solve": 2, "maxNodes": 1}
 
 # confirms a command is valid, and if so, executes it
 def exec_command(command, puzzle):
@@ -58,6 +57,7 @@ def interpret_command(command_tokens, puzzle):
         puzzle.print_state()
     elif base_command == "move":
         puzzle.move(command_tokens[1])
+        print(puzzle.h2())
     elif base_command == "solve":
         # puzzle.move(command_tokens[1])
         pass

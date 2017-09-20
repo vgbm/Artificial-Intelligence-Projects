@@ -1,5 +1,4 @@
-randomizeState 10
-printState
-move left
+move right
 move down
-printState
+move left
+move up

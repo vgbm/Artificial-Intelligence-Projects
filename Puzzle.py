@@ -7,6 +7,7 @@ _validMoves = ["up", "down", "left", "right"]
 # Goal state The goal state is "b12 345 678”.
 class Puzzle:
     def __init__(self):
+        self.separator = " "
         self.goalState = "b12 345 678"
         self.currState = self.goalState
         self.maxNodes = 0
@@ -56,6 +57,34 @@ class Puzzle:
         new_state[swap_tile_index] = "b"
 
         self.currState = "".join(new_state)
+
+    def h1(self):
+        diff = 0
+        for tile, goal in zip(self.currState, self.goalState):
+            if tile != goal:
+                diff += 1
+        return diff
+
+    def h2(self):
+        accum = 0
+
+        for idx, tile in enumerate(self.currState):
+            if tile != self.separator:
+                accum += Puzzle.dist(idx, self.goalState.find(tile))
+
+        return accum
+
+    # operates under the idea that |CurrTileIdx - GoalIdx| = 4*a + b amd dist = a + b
+    # then we solve a and b for each tile and add it to an accum
+    @staticmethod
+    def dist(currIdx, goalIdx):
+        idx_diff = abs(currIdx - goalIdx)
+
+        row_len = 4
+        a = int(idx_diff / row_len)
+        b = idx_diff %  row_len
+
+        return a + b
 
     # TODO
     # solves the puzzle w/ A*
