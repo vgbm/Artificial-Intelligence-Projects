@@ -19,7 +19,9 @@ class Puzzle:
     def randomize_state(self, n):
         self.currState = self.goalState
         for i in range(n):
-            self.move(random.choice(_validMoves))
+            direction = random.choice(_validMoves)
+            if self.is_movement_valid(direction):
+                self.move(direction)
 
     def print_state(self):
         print(self.currState)
@@ -35,21 +37,39 @@ class Puzzle:
 
     def _move_direction(self, direction):
         blank_index = self.currState.find("b")
+
+        if self.is_movement_valid(direction, blank_index = blank_index) == False:
+            print("Cannot move {} any further".format(direction))
+
         swap_tile_index = -1
 
-        if direction == "up" and blank_index > 2:
+        if direction == "up":
             swap_tile_index = blank_index - 4
-        elif direction == "down" and blank_index < 6:
+        elif direction == "down":
             swap_tile_index = blank_index + 4
-        elif direction == "left" and blank_index not in [0, 4, 8]:
+        elif direction == "left":
             swap_tile_index = blank_index - 1
-        elif direction == "right" and blank_index not in [2, 6, 10]:
+        elif direction == "right":
             swap_tile_index = blank_index + 1
 
-        if swap_tile_index == -1:
-            print("Cannot move {} any further".format(direction))
-        else:
-            self._swap(swap_tile_index, blank_index)
+        self._swap(swap_tile_index, blank_index)
+
+    # returns if a given direction is a viable move from the current position
+    def is_movement_valid(self, direction, blank_index = None):
+        if blank_index is None:
+            blank_index = self.currState.find("b")
+
+        if direction == "up" and blank_index <= 3:
+            return False
+        elif direction == "down" and blank_index >= 7:
+            return False
+        elif direction == "left" and blank_index in [0, 4, 8]:
+            return False
+        elif direction == "right" and blank_index in [2, 6, 10]:
+            return False
+
+        return True
+
 
     def _swap(self, swap_tile_index, blank_index):
         new_state = list(self.currState)
@@ -93,7 +113,7 @@ class Puzzle:
 
     # TODO
     # solves the puzzle w/ A*
-    # Heuristic can be either "h1" or "h2"
+    # Heuristic can be either h1 or h2
     # "h1" is num of misplaced tiles
     # "h2" is dist of tiles from their goal pos
     # prints / returns num moves to solu
