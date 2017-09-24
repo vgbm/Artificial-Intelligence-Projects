@@ -1,9 +1,7 @@
-# TODO Solution is non-optimal: https://n-puzzle-solver.appspot.com/
 # setState 52b 713 486
 
 import collections
 import random
-
 
 # possible moves
 _validMoves = ["up", "down", "left", "right"]
@@ -18,7 +16,7 @@ def full_move_list(puzzle):
         curr_node = curr_node.parent
 
     move_list.reverse()
-    return move_list
+    return ", ".join(move_list)
 
 
 # simple function that prints out solve success messages in a consistent format
@@ -36,7 +34,9 @@ def print_solve_failure(max_nodes):
 class Puzzle:
     def __init__(self):
         self.separator = " "
-        self.goalState = "b12 345 678"
+#        self.goalState = "b12 345 678"
+        self.goalState = "123 456 78b"
+
         self.currState = self.goalState
         self.maxNodes = 50
 
@@ -117,7 +117,7 @@ class Puzzle:
     def h1(self):
         diff = 0
         for tile, goal in zip(self.currState, self.goalState):
-            if tile != goal:
+            if tile != goal and tile != "b":
                 diff += 1
         return diff
 
@@ -125,14 +125,15 @@ class Puzzle:
         accum = 0
 
         for idx, tile in enumerate(self.currState):
-            if tile != self.separator:
+            if tile != self.separator and tile != "b":
                 accum += Puzzle.dist(idx, self.goalState.find(tile))
 
         return accum
 
     # Evaluation function chosen for beam search
     def beam_eval(self):
-        return self.h1() + self.h2()
+        return self.h2()
+        # return self.h1() + self.h2()
 
     # operates under the idea that |CurrTileIdx - GoalIdx| = 4*a + b amd dist = a + b
     # then we solve a and b for each tile and add it to an accum
@@ -178,7 +179,6 @@ class Puzzle:
 
         # Set up initial state
 
-        limit_hit = False
         # list of nodes which have already been expanded and don't need checked
         searched_nodes = []
 
@@ -188,10 +188,10 @@ class Puzzle:
 
         goal_node = None
 
-        # TODO Check for repeats?
         # while we still have nodes to explore, keep looking
         # otherwise, we have failed and must quit
-        while unexplored_nodes:
+        # Stop exploring if we hit the max node limit
+        while unexplored_nodes and len(searched_nodes) <= self.maxNodes:
             # explore the best node (lowest f(n))
             # and remove the best node from the unexplored list
             unexplored_nodes = sorted(unexplored_nodes, key=lambda x: x.cost)
@@ -199,15 +199,13 @@ class Puzzle:
 
             # Check if we've exhausted any more-optimal options
             if goal_node is not None and best_node.cost > goal_node.cost:
-                print_solve_success(best_node.depth, full_move_list(best_node.puzzle))
+                print_solve_success(goal_node.depth, full_move_list(goal_node.puzzle))
                 return
 
-            # TODO potentially remove the any check in favor of checking optimality
             # if the current state isn't in the existing searched nodes, add it
             if not any((best_node.puzzle.currState == node.puzzle.currState for node in searched_nodes)):
                 searched_nodes.append(best_node)
 
-            # TODO edge case where goal is the last node explorable?
             if best_node.puzzle.currState == best_node.puzzle.goalState:
                 # set goal_node to the more optimal solution
                 if goal_node is None:
@@ -224,14 +222,18 @@ class Puzzle:
 
                 new_node_depth = best_node.depth + 1
 
-                # if the node is reachable within our max limit, add it to unexplored
-                if new_node_depth <= self.maxNodes:
-                    new_node_cost = new_node_depth + heuristic_func(neighbor)
-                    new_node = Node(puzzle=neighbor, depth=new_node_depth, cost=new_node_cost)
+                # add the new node to the unexplored list
+                new_node_cost = new_node_depth + heuristic_func(neighbor)
+                new_node = Node(puzzle=neighbor, depth=new_node_depth, cost=new_node_cost)
 
-                    unexplored_nodes.append(new_node)
+                unexplored_nodes.append(new_node)
 
-        print_solve_failure(self.maxNodes)
+        # if we found a solution, but a more optimal path could still exist
+        # print out what we found as the solution
+        if goal_node is not None:
+            print_solve_success(goal_node.depth, full_move_list(goal_node.puzzle))
+        else:
+            print_solve_failure(self.maxNodes)
 
     # solves puzzle with local beam search
     # k is num of states
@@ -246,8 +248,8 @@ class Puzzle:
 
         # Set up initial state
 
+        node_count = 1
         depth = 1
-
         # Set starting states to self to start working off of
         # as this state is our starting position in the search
         states = [self]
@@ -255,13 +257,16 @@ class Puzzle:
         # stores all states so we know if a repeat occurred
         all_states = {self.currState}
 
-        while depth <= self.maxNodes:
+        while node_count <= self.maxNodes:
             new_states = []
             # collect all of the successor states with their f(n) value
             for state in states:
                 for neighbor in state.neighbors():
+                    node_count += 1
+
                     # Avoid repeat states
-                    if neighbor.currState not in all_states:
+                    if neighbor.currState not in all_states\
+                            and node_count < self.maxNodes:
                         new_states.append((neighbor.beam_eval(), neighbor))
                         all_states.add(neighbor.currState)
 
@@ -273,13 +278,13 @@ class Puzzle:
             # Checking if the front (best) state is at the goal
             if states[0].currState == states[0].goalState:
                 print_solve_success(depth, full_move_list(states[0]))
+                print(len(all_states))
                 return
 
             # trim states if needed
             if len(states) > k:
                 states = states[:k]
 
-            # increment depth, as we've moved a step
             depth += 1
 
         print_solve_failure(self.maxNodes)
