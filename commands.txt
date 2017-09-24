@@ -1,4 +1,4 @@
-randomizeState 60
+randomizeState 10000
 setState 52b 713 486
 printState
-solve beam 3000
+solve A-star h2

@@ -1,4 +1,5 @@
 # TODO Solution is non-optimal: https://n-puzzle-solver.appspot.com/
+# setState 52b 713 486
 
 import collections
 import random
