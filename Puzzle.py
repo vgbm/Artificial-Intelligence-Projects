@@ -1,7 +1,6 @@
 # TODO Solution is non-optimal: https://n-puzzle-solver.appspot.com/
 
 import collections
-import copy
 import random
 
 
@@ -253,13 +252,18 @@ class Puzzle:
         # as this state is our starting position in the search
         states = [self]
 
-        # TODO Check for repeats?
+        # stores all states so we know if a repeat occurred
+        all_states = [self.currState]
+
         while depth <= self.maxNodes:
             new_states = []
             # collect all of the successor states with their f(n) value
             for state in states:
                 for neighbor in state.neighbors():
-                    new_states.append((neighbor.beam_eval(), neighbor))
+                    # Avoid repeat states
+                    if neighbor.currState not in all_states:
+                        new_states.append((neighbor.beam_eval(), neighbor))
+                        all_states.append(neighbor.currState)
 
             new_states = sorted(new_states, key=lambda x: x[0])
 
@@ -285,9 +289,8 @@ class Puzzle:
         neighbors = []
         for direction in _validMoves:
             if self._is_movement_valid(direction):
-                # clone the state to carry over all variables to the new states
-                # e.g. maxNodes
-                neighboring_node = copy.deepcopy(self)
+                # Create the new neighbor object
+                neighboring_node = Puzzle()
                 neighboring_node.set_state(self.currState)
                 neighboring_node.parent = self
                 neighboring_node.parentMove = direction
