@@ -1,8 +1,11 @@
-import random
+import collections
 import copy
+import random
+
 
 # possible moves
 _validMoves = ["up", "down", "left", "right"]
+
 
 def full_move_list(puzzle):
     move_list = []
@@ -25,6 +28,7 @@ def print_solve_success(move_count, move_list):
 
 def print_solve_failure(max_nodes):
     print("No solution was found in {} moves.".format(max_nodes))
+
 
 # Goal state The goal state is "b12 345 678”.
 class Puzzle:
@@ -69,7 +73,7 @@ class Puzzle:
     def _move_direction(self, direction):
         blank_index = self.currState.find("b")
 
-        if self._is_movement_valid(direction, blank_index = blank_index) == False:
+        if not self._is_movement_valid(direction, blank_index=blank_index):
             print("Cannot move {} any further".format(direction))
 
         swap_tile_index = -1
@@ -147,11 +151,10 @@ class Puzzle:
 
     def solve(self, method, param):
         if method == "A-star":
-            solveFunc = self._solve_AStar
             if param == "h1":
-                self._solve_AStar(self.h1)
+                self._solve_AStar(lambda puzzle: puzzle.h1())
             elif param == "h2":
-                self._solve_AStar(self.h2)
+                self._solve_AStar(lambda puzzle: puzzle.h2())
             else:
                 raise ValueError("Invalid heuristic function")
         elif method == "beam":
@@ -159,15 +162,60 @@ class Puzzle:
         else:
             raise ValueError("Not a solve method")
 
-    # TODO
     # solves the puzzle w/ A*
     # Heuristic can be either h1 or h2
     # "h1" is num of misplaced tiles
     # "h2" is dist of tiles from their goal pos
     # prints / returns num moves to solu
     # and seq of moves ("up", "up"...)
-    def _solve_AStar(self, heuristic):
-        pass
+    def _solve_AStar(self, heuristic_func):
+        if self.currState == self.goalState:
+            print("0 moves. At goal state.")
+
+        Node = collections.namedtuple("Node", ["puzzle", "depth", "cost"])
+
+        # Set up initial state
+
+        limit_hit = False
+        # list of nodes which have already been expanded and don't need checked
+        searched_nodes = []
+
+        # list of nodes which need to be expanded
+        # starting as this node = self and f(n) = h(n) as g(n) = 0 at the initial node
+        unexplored_nodes = [Node(puzzle=self, depth=0, cost=heuristic_func(self))]
+
+        # TODO Check for repeats?
+        # while we still have nodes to explore, keep looking
+        # otherwise, we have failed and must quit
+        while unexplored_nodes:
+            # explore the best node (lowest f(n))
+            # and remove the best node from the unexplored list
+            unexplored_nodes = sorted(unexplored_nodes, key=lambda x: x.cost)
+            best_node = unexplored_nodes.pop(0)
+
+            # if the current state isn't in the existing searched nodes, add it
+            if not any([best_node.puzzle.currState == node.puzzle.currState for node in searched_nodes]):
+                searched_nodes.append(best_node)
+
+            # TODO Change so it makes sure this is the optimal path
+            if best_node.puzzle.currState == best_node.puzzle.goalState:
+                print_solve_success(best_node.depth, full_move_list(best_node.puzzle))
+                return
+
+            # Add the neighbors of the best node to the unexplored list
+            # so we can explore these nodes in the future
+            for neighbor in best_node.puzzle.neighbors():
+                new_node_depth = best_node.depth + 1
+
+                # if the node is reachable within our max limit, add it to unexplored
+                if new_node_depth <= self.maxNodes:
+                    new_node_cost = new_node_depth + heuristic_func(neighbor)
+                    new_node = Node(puzzle=neighbor, depth=new_node_depth, cost=new_node_cost)
+
+                    unexplored_nodes.append(new_node)
+
+        print_solve_failure(self.maxNodes)
+
 
     # solves puzzle with local beam search
     # k is num of states
@@ -181,17 +229,19 @@ class Puzzle:
             print("0 moves. At goal state.")
 
         # Set up initial state
+
         depth = 1
 
         # Set starting states to self to start working off of
         # as this state is our starting position in the search
         states = [self]
 
+        # TODO Check for repeats?
         while depth <= self.maxNodes:
             new_states = []
             # collect all of the successor states with their f(n) value
             for state in states:
-                for neighbor in state._neighbors():
+                for neighbor in state.neighbors():
                     new_states.append((neighbor.beam_eval(), neighbor))
 
             new_states = sorted(new_states, key=lambda x: x[0])
@@ -214,7 +264,7 @@ class Puzzle:
         print_solve_failure(self.maxNodes)
 
     # Return Puzzle object for all valid neighboring positions
-    def _neighbors(self):
+    def neighbors(self):
         neighbors = []
         for direction in _validMoves:
             if self._is_movement_valid(direction):
