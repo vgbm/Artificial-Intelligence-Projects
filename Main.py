@@ -46,7 +46,6 @@ def exec_command(command, puzzle):
 
 
 def interpret_command(command_tokens, puzzle):
-    print(command_tokens)
     base_command = command_tokens[0]
 
     if base_command == "setState":
@@ -58,7 +57,7 @@ def interpret_command(command_tokens, puzzle):
     elif base_command == "move":
         puzzle.move(command_tokens[1])
     elif base_command == "solve":
-        # puzzle.move(command_tokens[1])
+        puzzle.solve(method=command_tokens[1], param=command_tokens[2])
         pass
     elif base_command == "maxNodes":
         puzzle.set_max_nodes(int(command_tokens[1]))
