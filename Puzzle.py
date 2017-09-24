@@ -232,7 +232,6 @@ class Puzzle:
 
         print_solve_failure(self.maxNodes)
 
-
     # solves puzzle with local beam search
     # k is num of states
     # eval func is defined by me and is explained in write up
@@ -253,7 +252,7 @@ class Puzzle:
         states = [self]
 
         # stores all states so we know if a repeat occurred
-        all_states = [self.currState]
+        all_states = {self.currState}
 
         while depth <= self.maxNodes:
             new_states = []
@@ -263,7 +262,7 @@ class Puzzle:
                     # Avoid repeat states
                     if neighbor.currState not in all_states:
                         new_states.append((neighbor.beam_eval(), neighbor))
-                        all_states.append(neighbor.currState)
+                        all_states.add(neighbor.currState)
 
             new_states = sorted(new_states, key=lambda x: x[0])
 
