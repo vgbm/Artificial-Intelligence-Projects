@@ -1,3 +1,4 @@
 randomizeState 60
+setState 52b 713 486
 printState
 solve A-star h2

@@ -1,3 +1,5 @@
+# TODO Solution is non-optimal: https://n-puzzle-solver.appspot.com/
+
 import collections
 import copy
 import random
@@ -11,7 +13,7 @@ def full_move_list(puzzle):
     move_list = []
     curr_node = puzzle
 
-    while curr_node is not None:
+    while curr_node.parentMove is not None:
         move_list.append(curr_node.parentMove)
         curr_node = curr_node.parent
 
@@ -184,6 +186,8 @@ class Puzzle:
         # starting as this node = self and f(n) = h(n) as g(n) = 0 at the initial node
         unexplored_nodes = [Node(puzzle=self, depth=0, cost=heuristic_func(self))]
 
+        goal_node = None
+
         # TODO Check for repeats?
         # while we still have nodes to explore, keep looking
         # otherwise, we have failed and must quit
@@ -193,18 +197,31 @@ class Puzzle:
             unexplored_nodes = sorted(unexplored_nodes, key=lambda x: x.cost)
             best_node = unexplored_nodes.pop(0)
 
-            # if the current state isn't in the existing searched nodes, add it
-            if not any([best_node.puzzle.currState == node.puzzle.currState for node in searched_nodes]):
-                searched_nodes.append(best_node)
-
-            # TODO Change so it makes sure this is the optimal path
-            if best_node.puzzle.currState == best_node.puzzle.goalState:
+            # Check if we've exhausted any more-optimal options
+            if goal_node is not None and best_node.cost > goal_node.cost:
                 print_solve_success(best_node.depth, full_move_list(best_node.puzzle))
                 return
+
+            # TODO potentially remove the any check in favor of checking optimality
+            # if the current state isn't in the existing searched nodes, add it
+            if not any((best_node.puzzle.currState == node.puzzle.currState for node in searched_nodes)):
+                searched_nodes.append(best_node)
+
+            # TODO edge case where goal is the last node explorable?
+            if best_node.puzzle.currState == best_node.puzzle.goalState:
+                # set goal_node to the more optimal solution
+                if goal_node is None:
+                    goal_node = best_node
+                else:
+                    goal_node = best_node if best_node.cost < goal_node.cost else goal_node
 
             # Add the neighbors of the best node to the unexplored list
             # so we can explore these nodes in the future
             for neighbor in best_node.puzzle.neighbors():
+                # ignore neighbors which have been explored
+                if neighbor.currState in (node.puzzle.currState for node in searched_nodes):
+                    continue
+
                 new_node_depth = best_node.depth + 1
 
                 # if the node is reachable within our max limit, add it to unexplored

@@ -29,7 +29,7 @@ def run_from_user_input():
 
 # list of valid commands and how many arguments each takes
 # defined in the requirements doc
-commands = {"setState": 1, "randomizeState": 1, "printState": 0, "move": 1, "solve": 2, "maxNodes": 1}
+commands = {"setState": 3, "randomizeState": 1, "printState": 0, "move": 1, "solve": 2, "maxNodes": 1}
 
 # confirms a command is valid, and if so, executes it
 def exec_command(command, puzzle):
@@ -39,7 +39,8 @@ def exec_command(command, puzzle):
     if command_tokens[0] not in commands:
         raise ValueError("Not a valid command")
     # if the wrong number of args are present
-    elif len(command_tokens) - 1 != commands[command_tokens[0]]:
+
+    if len(command_tokens) - 1 != commands[command_tokens[0]]:
         raise ValueError("Command fed the wrong number of arguments")
 
     interpret_command(command_tokens, puzzle)
@@ -49,7 +50,7 @@ def interpret_command(command_tokens, puzzle):
     base_command = command_tokens[0]
 
     if base_command == "setState":
-        puzzle.set_state(command_tokens[1])
+        puzzle.set_state(" ".join(command_tokens[1:]))
     elif base_command == "randomizeState":
         puzzle.randomize_state(int(command_tokens[1]))
     elif base_command == "printState":
