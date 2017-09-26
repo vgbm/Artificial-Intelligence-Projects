@@ -54,6 +54,10 @@ class Puzzle:
 
     # make n random moves from goal state
     def randomize_state(self, n):
+        # seed random so randomize state calls with the same n yield the same state
+        # for testing / grading purposes
+        random.seed(5499)
+
         self.currState = self.goalState
         for i in range(n):
             direction = random.choice(_validMoves)
@@ -210,7 +214,7 @@ class Puzzle:
                 searched_nodes.append(best_node)
             # otherwise, if this path to this node is more optimal, remove the worse path
             # and add the new path
-            # TODO ##########################################3
+            # TODO ##########################################
             # elif:
 
             if best_node.puzzle.currState == best_node.puzzle.goalState:

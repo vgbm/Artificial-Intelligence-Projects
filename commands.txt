@@ -1,5 +1,4 @@
-setState b42 135 678
+randomizeState 100
 printState
 solve beam 100
-solve A-star h1
 solve A-star h2
