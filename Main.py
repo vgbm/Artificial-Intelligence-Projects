@@ -31,6 +31,7 @@ def run_from_user_input():
 # defined in the requirements doc
 commands = {"setState": 3, "randomizeState": 1, "printState": 0, "move": 1, "solve": 2, "maxNodes": 1}
 
+
 # confirms a command is valid, and if so, executes it
 def exec_command(command, puzzle):
     command_tokens = command.split()
