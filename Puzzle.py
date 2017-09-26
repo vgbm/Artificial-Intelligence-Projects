@@ -5,6 +5,8 @@ import random
 _validMoves = ["up", "down", "left", "right"]
 
 
+# Returns the moves used to generate the goal state of the puzzle (as a string)
+# by iterating through the puzzle states' parents
 def full_move_list(puzzle):
     move_list = []
     curr_node = puzzle
@@ -24,6 +26,7 @@ def print_solve_success(move_count, move_list):
     print(message)
 
 
+# prints a failure to solve message
 def print_solve_failure(max_nodes):
     print("No solution was found in {} moves.".format(max_nodes))
 
