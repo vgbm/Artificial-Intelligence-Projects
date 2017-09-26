@@ -134,8 +134,9 @@ class Puzzle:
     def beam_eval(self):
         return self.h2()
 
-    # operates under the idea that |CurrTileIdx - GoalIdx| = 4*a + b amd dist = a + b
-    # then we solve a and b for each tile and add it to an accum
+    # Dist returns the manhattan distance between 2 indices, the goal and current index
+    # Calculates the row and column positions for the goal and current tile positions
+    # and then calculates the final distance from that
     @staticmethod
     def dist(curr_idx, goal_idx):
         row_len = 4
