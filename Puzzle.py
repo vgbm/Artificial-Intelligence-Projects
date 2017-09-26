@@ -133,7 +133,6 @@ class Puzzle:
     # Evaluation function chosen for beam search
     def beam_eval(self):
         return self.h2()
-        # return self.h1() + self.h2()
 
     # operates under the idea that |CurrTileIdx - GoalIdx| = 4*a + b amd dist = a + b
     # then we solve a and b for each tile and add it to an accum
@@ -152,16 +151,18 @@ class Puzzle:
         # return the absolute dist between the points
         return abs(goal_row - curr_row) + abs(goal_col - curr_col)
 
+    # Dispatches to the proper solve method
+    # Should return solution length
     def solve(self, method, param):
         if method == "A-star":
             if param == "h1":
-                self._solve_AStar(lambda puzzle: puzzle.h1())
+                return self._solve_AStar(lambda puzzle: puzzle.h1())
             elif param == "h2":
-                self._solve_AStar(lambda puzzle: puzzle.h2())
+                return self._solve_AStar(lambda puzzle: puzzle.h2())
             else:
                 raise ValueError("Invalid heuristic function")
         elif method == "beam":
-            self._solve_beam(int(param))
+            return self._solve_beam(int(param))
         else:
             raise ValueError("Not a solve method")
 
@@ -171,6 +172,7 @@ class Puzzle:
     # "h2" is dist of tiles from their goal pos
     # prints / returns num moves to solu
     # and seq of moves ("up", "up"...)
+    # Returns move count if solution is found or -1 otherwise
     def _solve_AStar(self, heuristic_func):
         if self.currState == self.goalState:
             print("0 moves. At goal state.")
@@ -200,7 +202,7 @@ class Puzzle:
             # Check if we've exhausted any more-optimal options
             if goal_node is not None and best_node.cost > goal_node.cost:
                 print_solve_success(goal_node.depth, full_move_list(goal_node.puzzle))
-                return
+                return goal_node.depth
 
             # if the current state isn't in the existing searched nodes, add it
             if not any((best_node.puzzle.currState == node.puzzle.currState for node in searched_nodes)):
@@ -236,8 +238,10 @@ class Puzzle:
         # print out what we found as the solution
         if goal_node is not None:
             print_solve_success(goal_node.depth, full_move_list(goal_node.puzzle))
+            return goal_node.depth
         else:
             print_solve_failure(self.maxNodes)
+            return -1
 
     # solves puzzle with local beam search
     # k is num of states
@@ -245,7 +249,7 @@ class Puzzle:
     # eval func = 0 at goal
     # prints / returns num moves to solu
     # and seq of moves ("up", "up"...)
-    # Returns (move count, move list)
+    # Returns move count if solution is found or -1 otherwise
     def _solve_beam(self, k):
         if self.currState == self.goalState:
             print("0 moves. At goal state.")
@@ -282,8 +286,7 @@ class Puzzle:
             # Checking if the front (best) state is at the goal
             if states[0].currState == states[0].goalState:
                 print_solve_success(depth, full_move_list(states[0]))
-                print(len(all_states))
-                return
+                return depth
 
             # trim states if needed
             if len(states) > k:
@@ -292,6 +295,7 @@ class Puzzle:
             depth += 1
 
         print_solve_failure(self.maxNodes)
+        return -1
 
     # Return Puzzle object for all valid neighboring positions
     def neighbors(self):
