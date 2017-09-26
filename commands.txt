@@ -1,5 +1,5 @@
-randomizeState 30
-maxNodes 5000000
+setState b42 135 678
 printState
+solve beam 100
 solve A-star h1
 solve A-star h2

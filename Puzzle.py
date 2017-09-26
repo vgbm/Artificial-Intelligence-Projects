@@ -1,5 +1,3 @@
-# setState 52b 713 486
-
 import collections
 import random
 
@@ -34,11 +32,10 @@ def print_solve_failure(max_nodes):
 class Puzzle:
     def __init__(self):
         self.separator = " "
-#        self.goalState = "b12 345 678"
-        self.goalState = "123 456 78b"
+        self.goalState = "b12 345 678"
 
         self.currState = self.goalState
-        self.maxNodes = 50
+        self.maxNodes = 10000
 
         # parent node information
         self.parent = None
