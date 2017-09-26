@@ -1,6 +1,7 @@
 import unittest
 from Puzzle import Puzzle
 
+
 class TestPuzzle(unittest.TestCase):
     def test_h1(self):
         puzzle = Puzzle()
