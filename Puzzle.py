@@ -205,6 +205,10 @@ class Puzzle:
             # if the current state isn't in the existing searched nodes, add it
             if not any((best_node.puzzle.currState == node.puzzle.currState for node in searched_nodes)):
                 searched_nodes.append(best_node)
+            # otherwise, if this path to this node is more optimal, remove the worse path
+            # and add the new path
+            # TODO ##########################################3
+            # elif:
 
             if best_node.puzzle.currState == best_node.puzzle.goalState:
                 # set goal_node to the more optimal solution
