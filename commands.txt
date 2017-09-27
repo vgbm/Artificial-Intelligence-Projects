@@ -1,5 +1,4 @@
 randomizeState 100
-setState 52b 713 486
 printState
 solve beam 100
 solve A-star h2

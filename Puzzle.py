@@ -38,7 +38,7 @@ class Puzzle:
         self.goalState = "b12 345 678"
 
         self.currState = self.goalState
-        self.maxNodes = 10000
+        self.maxNodes = 5000
 
         # parent node information
         self.parent = None
