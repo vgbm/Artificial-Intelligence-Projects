@@ -199,6 +199,7 @@ class Puzzle:
         # otherwise, we have failed and must quit
         # Stop exploring if we hit the max node limit
         while unexplored_nodes and len(searched_nodes) <= self.maxNodes:
+
             # explore the best node (lowest f(n))
             # and remove the best node from the unexplored list
             unexplored_nodes = sorted(unexplored_nodes, key=lambda x: x.cost)
@@ -209,20 +210,27 @@ class Puzzle:
                 print_solve_success(goal_node.depth, full_move_list(goal_node.puzzle))
                 return goal_node.depth
 
-            # if the current state isn't in the existing searched nodes, add it
-            if not any((best_node.puzzle.currState == node.puzzle.currState for node in searched_nodes)):
-                searched_nodes.append(best_node)
-            # otherwise, if this path to this node is more optimal, remove the worse path
-            # and add the new path
-            # TODO ##########################################
-            # elif:
-
+            # check if we have found a solution
             if best_node.puzzle.currState == best_node.puzzle.goalState:
                 # set goal_node to the more optimal solution
+                # or set goal_node if it has not been found yet
                 if goal_node is None:
                     goal_node = best_node
                 else:
                     goal_node = best_node if best_node.cost < goal_node.cost else goal_node
+
+            # get any already explored nodes that match the current node
+            existing_node = next((node for node in searched_nodes
+                                  if best_node.puzzle.currState == node.puzzle.currState), None)
+
+            # if the current state isn't in the existing searched nodes, add it
+            if existing_node is None:
+                searched_nodes.append(best_node)
+            # otherwise, if this path to this node is more optimal, remove the worse path
+            # and add the new path
+            elif existing_node.cost > best_node.cost:
+                searched_nodes.remove(existing_node)
+                searched_nodes.append(best_node)
 
             # Add the neighbors of the best node to the unexplored list
             # so we can explore these nodes in the future
