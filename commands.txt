@@ -1,4 +1,3 @@
-randomizeState 100
-printState
-solve beam 100
-solve A-star h2
+maxNodes 1000
+randomizeState 15
+solve A-star h1

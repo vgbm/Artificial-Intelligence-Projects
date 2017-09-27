@@ -56,7 +56,7 @@ class Puzzle:
     def randomize_state(self, n):
         # seed random so randomize state calls with the same n yield the same state
         # for testing / grading purposes
-        random.seed(5499)
+        random.seed(5497)
 
         self.currState = self.goalState
         for i in range(n):
@@ -181,6 +181,7 @@ class Puzzle:
     def _solve_AStar(self, heuristic_func):
         if self.currState == self.goalState:
             print("0 moves. At goal state.")
+            return 0
 
         Node = collections.namedtuple("Node", ["puzzle", "depth", "cost"])
 
@@ -266,6 +267,7 @@ class Puzzle:
     def _solve_beam(self, k):
         if self.currState == self.goalState:
             print("0 moves. At goal state.")
+            return 0
 
         # Set up initial state
 
