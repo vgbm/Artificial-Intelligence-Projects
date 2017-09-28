@@ -1,3 +1,7 @@
-maxNodes 1000
-randomizeState 15
-solve A-star h1
+maxNodes 10000
+setState b42 135 678
+solve A-star h2
+solve beam 50
+setState b21 345 678
+solve A-star h2
+solve beam 50

@@ -52,13 +52,6 @@ class TestPuzzle(unittest.TestCase):
         # expect the solution to be optimal only because the solution is so short
         self.assertEqual(4, move_count)
 
-    #########################
-    # Advanced search tests #
-    #########################
-
-    ##########################
-    # Edge case search tests #
-    ##########################
 
 if __name__ == '__main__':
     unittest.main()
